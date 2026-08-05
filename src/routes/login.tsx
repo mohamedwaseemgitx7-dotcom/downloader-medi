@@ -40,49 +40,77 @@ function LoginPage() {
   const signIn = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      toast.success("Signed in successfully!");
+      navigate({ to: "/dashboard", replace: true });
+    } catch (err: any) {
+      toast.error(err?.message || "Sign in failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    navigate({ to: "/dashboard", replace: true });
   };
 
   const signUp = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { doctor_name: doctorName, hospital_name: hospitalName },
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin,
+          data: { doctor_name: doctorName, hospital_name: hospitalName },
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      if (data.user) {
+        if (data.session) {
+          try {
+            await supabase.from("profiles").upsert({
+              id: data.user.id,
+              doctor_name: doctorName,
+              hospital_name: hospitalName,
+            });
+          } catch (e) {
+            console.warn("Profile upsert warning:", e);
+          }
+          toast.success("Account created successfully!");
+          navigate({ to: "/dashboard", replace: true });
+        } else {
+          toast.success("Account created! Please check your email or sign in below.");
+        }
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Account creation failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    if (!data.session) {
-      toast.success("Check your email to confirm your account, then sign in.");
-      return;
-    }
-    navigate({ to: "/dashboard", replace: true });
   };
 
   const signInWithGoogle = async () => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) {
+        toast.error(error.message || "Google sign-in failed. Please try again.");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Google sign-in failed.");
+    } finally {
       setLoading(false);
-      toast.error(error.message || "Google sign-in failed. Please try again.");
     }
   };
 
