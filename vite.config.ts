@@ -6,8 +6,8 @@ export default defineConfig({
     global: "globalThis",
   },
   build: {
-    target: "es2020",
-    cssTarget: "safari14",
+    target: ["es2015", "safari12"],
+    cssTarget: ["safari12", "ios_saf 12"],
   },
   tanstackStart: {
     server: { entry: "server" },
