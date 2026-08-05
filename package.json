@@ -11,6 +11,15 @@
     "lint": "eslint .",
     "format": "prettier --write ."
   },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 iOS versions",
+    "safari >= 12",
+    "ios_saf >= 12",
+    "not dead"
+  ],
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",

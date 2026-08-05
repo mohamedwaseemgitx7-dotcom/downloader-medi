@@ -167,3 +167,17 @@
   background-clip: text;
   color: transparent;
 }
+
+/* Safari & iOS Mobile Compatibility */
+html, body {
+  min-height: 100%;
+  min-height: -webkit-fill-available;
+}
+
+input, select, textarea {
+  font-size: 16px !important; /* Prevents iOS Safari auto-zoom on input focus */
+}
+
+.scrollable {
+  -webkit-overflow-scrolling: touch;
+}
