@@ -118,7 +118,23 @@ export async function downloadPatientPdf(
     renderDocument(patient, definition, header),
     import("file-saver"),
   ]);
-  saveAs(blob, pdfFileName(patient, definition));
+  const filename = pdfFileName(patient, definition);
+  const isIOS =
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+  if (isIOS) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    saveAs(blob, filename);
+  }
 }
 
 export async function downloadPatientsZip(
@@ -136,5 +152,21 @@ export async function downloadPatientsZip(
     zip.file(pdfFileName(patient, definition), blob);
   }
   const archive = await zip.generateAsync({ type: "blob" });
-  saveAs(archive, `medforms-${definition.type}-${patients.length}-records.zip`);
+  const filename = `medforms-${definition.type}-${patients.length}-records.zip`;
+  const isIOS =
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+
+  if (isIOS) {
+    const url = URL.createObjectURL(archive);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    saveAs(archive, filename);
+  }
 }
