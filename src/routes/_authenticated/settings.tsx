@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { getProfile, saveProfile } from "@/lib/patients.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Settings — MedForms Pro" },

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FORM_DEFINITIONS, FORM_TYPES } from "@/lib/form-config";
 
 export const Route = createFileRoute("/")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "MedForms Pro — Patient Forms Management for Doctors" },

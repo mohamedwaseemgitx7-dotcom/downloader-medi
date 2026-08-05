@@ -15,6 +15,7 @@ import { deletePatient, getPatient, getStats, listPatients, logDownloads } from 
 import { downloadPatientPdf, downloadPatientsZip } from "@/lib/pdf";
 
 export const Route = createFileRoute("/_authenticated/forms/$type/")({
+  ssr: false,
   beforeLoad: ({ params }) => {
     if (!getDefinition(params.type)) throw notFound();
   },

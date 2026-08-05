@@ -13,6 +13,7 @@ import { getPatient, getStats, logDownloads } from "@/lib/patients.functions";
 import { downloadPatientPdf } from "@/lib/pdf";
 
 export const Route = createFileRoute("/_authenticated/forms/$type/$patientId")({
+  ssr: false,
   beforeLoad: ({ params }) => {
     if (!getDefinition(params.type)) throw notFound();
   },

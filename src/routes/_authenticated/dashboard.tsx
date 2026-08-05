@@ -8,6 +8,7 @@ import { getStats } from "@/lib/patients.functions";
 import { FORM_DEFINITIONS, FORM_TYPES } from "@/lib/form-config";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Dashboard — MedForms Pro" },

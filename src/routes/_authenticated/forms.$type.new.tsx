@@ -9,6 +9,7 @@ import { getDefinition, type PatientStatus } from "@/lib/form-config";
 import { createPatient } from "@/lib/patients.functions";
 
 export const Route = createFileRoute("/_authenticated/forms/$type/new")({
+  ssr: false,
   beforeLoad: ({ params }) => {
     if (!getDefinition(params.type)) throw notFound();
   },

@@ -10,6 +10,7 @@ import { getDefinition, type PatientStatus } from "@/lib/form-config";
 import { getPatient, updatePatient } from "@/lib/patients.functions";
 
 export const Route = createFileRoute("/_authenticated/forms/$type/edit/$patientId")({
+  ssr: false,
   beforeLoad: ({ params }) => {
     if (!getDefinition(params.type)) throw notFound();
   },
