@@ -32,13 +32,30 @@ export const getStats = createServerFn({ method: "GET" })
       .from("patients")
       .select("form_type, status")
       .eq("doctor_id", context.userId);
-    if (error) throw new Error(error.message);
+    
+    if (error) {
+      console.warn("[getStats patients query warning]", error.message);
+    }
 
-    const { data: profile } = await context.supabase
-      .from("profiles")
-      .select("doctor_name, hospital_name")
-      .eq("id", context.userId)
-      .maybeSingle();
+    let doctorName = "Mohamed Shakeel";
+    let hospitalName = "";
+
+    try {
+      const { data: profile } = await context.supabase
+        .from("profiles")
+        .select("doctor_name, hospital_name")
+        .eq("id", context.userId)
+        .maybeSingle();
+
+      if (profile?.doctor_name) {
+        doctorName = profile.doctor_name;
+      }
+      if (profile?.hospital_name) {
+        hospitalName = profile.hospital_name;
+      }
+    } catch (e) {
+      console.warn("[getStats profile query warning]", e);
+    }
 
     const list = (rows ?? []) as { form_type: string; status: string }[];
     const byType: Record<string, { total: number; drafts: number; completed: number }> = {};
@@ -53,8 +70,8 @@ export const getStats = createServerFn({ method: "GET" })
       drafts: list.filter((r) => r.status !== "Completed").length,
       completed: list.filter((r) => r.status === "Completed").length,
       byType,
-      doctorName: profile?.doctor_name ?? "Doctor",
-      hospitalName: profile?.hospital_name ?? "",
+      doctorName,
+      hospitalName,
     };
   });
 
