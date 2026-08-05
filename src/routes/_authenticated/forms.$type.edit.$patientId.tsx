@@ -59,7 +59,7 @@ function EditPatient() {
       toast.success("Record saved");
       navigate({ to: "/forms/$type/$patientId", params: { type, patientId } });
     },
-    onError: () => toast.error("Could not save this record"),
+    onError: (error) => toast.error(error.message || "Could not save this record"),
   });
 
   return (

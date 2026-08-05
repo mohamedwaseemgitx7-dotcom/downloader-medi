@@ -105,6 +105,12 @@ export const createPatient = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => createPatientSchema.parse(data))
   .handler(async ({ data, context }) => {
+    // Generate fallback patient_id format PATIENTXXX in case sequence is not attached
+    const fallbackId = `PATIENT${Math.floor(1000 + Math.random() * 9000)}`;
+
+    let insertedPatientId = "";
+    
+    // First attempt: insert without explicit patient_id (relying on DB default/sequence)
     const { data: inserted, error } = await context.supabase
       .from("patients")
       .insert({
@@ -114,16 +120,44 @@ export const createPatient = createServerFn({ method: "POST" })
         patient_name: data.patientName,
       })
       .select("patient_id")
-      .single();
-    if (error) throw new Error(error.message);
+      .maybeSingle();
 
-    const patientId = (inserted as { patient_id: string }).patient_id;
+    if (error || !inserted?.patient_id) {
+      // Second attempt: insert with explicitly provided patient_id
+      const { data: retryInserted, error: retryError } = await context.supabase
+        .from("patients")
+        .insert({
+          patient_id: fallbackId,
+          doctor_id: context.userId,
+          form_type: data.formType,
+          status: data.status,
+          patient_name: data.patientName,
+        })
+        .select("patient_id")
+        .single();
+
+      if (retryError) {
+        console.error("[createPatient Error]", retryError);
+        throw new Error(retryError.message);
+      }
+      insertedPatientId = retryInserted.patient_id;
+    } else {
+      insertedPatientId = inserted.patient_id;
+    }
+
     const { error: formError } = await context.supabase
       .from("form_data")
-      .insert({ patient_id: patientId, form_json: data.formJson });
-    if (formError) throw new Error(formError.message);
+      .upsert(
+        { patient_id: insertedPatientId, form_json: data.formJson },
+        { onConflict: "patient_id" }
+      );
+      
+    if (formError) {
+      console.error("[createPatient form_data Error]", formError);
+      throw new Error(formError.message);
+    }
 
-    return { patientId };
+    return { patientId: insertedPatientId };
   });
 
 export const updatePatient = createServerFn({ method: "POST" })
