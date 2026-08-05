@@ -13,11 +13,11 @@ clinical form types, auto-generated patient IDs, editable drafts, and client-sid
 | Styling | Tailwind CSS v4 + shadcn/ui |
 | Forms | React Hook Form + Zod |
 | Server state | TanStack Query |
-| Backend | Lovable Cloud (Postgres + Auth + Row Level Security) |
+| Backend | Supabase (Postgres + Auth + Row Level Security) |
 | Server logic | TanStack `createServerFn` (typed RPC, runs server-side) |
 | PDF | `@react-pdf/renderer` (fully client-side) |
 | Bulk export | JSZip + file-saver |
-| Hosting | Lovable hosting (automatic HTTPS, publish from the editor) |
+| Hosting | Vercel / AWS Amplify |
 
 ## Local development
 
@@ -26,8 +26,7 @@ npm install
 npm run dev
 ```
 
-Environment variables are read from `.env` (already provisioned by Lovable Cloud). See
-`.env.example` for the required names. Only the publishable key is ever exposed to the browser.
+Environment variables are read from `.env`. See `.env.example` for the required names. Only the publishable key is ever exposed to the browser.
 
 ## Routes
 
@@ -69,8 +68,3 @@ Every form supports **Save draft** (partial data allowed) and **Mark completed**
 - Only the publishable key reaches the browser; the service role key is never used in client code
 - PDFs are rendered on the doctor's device — no patient data is sent to a third-party PDF service
 - Hosting serves the app over HTTPS only
-
-## Deploying
-
-Press **Publish** in the Lovable editor. Backend changes (schema, policies, server functions) go
-live immediately; frontend changes go live when you publish.
